@@ -26,7 +26,7 @@ Neste teste você criará um *middleware* para uma API pública sobre voos espac
 
 Ou seja, você receberá alguns requests, fará um tratamento dos dados recebidos e consultará a API abaixo:
 
-**Space Flight News API –** https://www.spaceflightnewsapi.net/documentation#/
+**Space Flight News API –** https://api.spaceflightnewsapi.net/documentation/
 
 ### IMPORTANTE
 O foco do teste é desenvolver uma API. O retorno é somente JSON. **Não desenvolva interface gráfica em PHP!**
