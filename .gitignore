@@ -1,6 +1,7 @@
 .env
+.phpunit.cache
+.phpunit.cache/test-results
 docker-compose.yml
-punit.cache
 /public/build
 /public/hot
 /public/storage
