@@ -16,3 +16,54 @@ Assim que clonei o projeto e li o readme, analisei no seguinte fluxo:
 - 9 para 10 https://laravel.com/docs/10.x/upgrade
 
 2. Ao instalar o laravel sail, percebi que o projeto não tem um .env e nem mesmo um .env.example. Adicionei os dois ao projeto.
+
+3. Criei a migration de acordo com readme
+4. Vi que os models não estão na pasta que deveriam e está vazio. Ajustei o namespace e criei os campos:
+Antes:
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Report extends Model
+{
+    //
+}
+```
+Depois:
+```php
+<?php
+
+namespace App\Models;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * @property int $id
+ * @property int $external_id
+ * @property string $title
+ * @property string $url
+ * @property string $summary
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
+class Report extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'external_id',
+        'title',
+        'url',
+        'summary',
+        'created_at',
+        'updated_at'
+    ];
+}
+```
+5. Vi que não existe também um ReportFactory, então fiz também para acompanhar nos meus testes e prosseguir com TDD. Está em *database/factories/ReportFactory.php*
+6. 

@@ -3,6 +3,10 @@
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/teste', function () {
+    dd('ta funfando ehe');
+});
+
 // Listar Reports
 Route::get('api/v1/reports', [ReportController::class, 'listReports'])->name('reports.list');
 
