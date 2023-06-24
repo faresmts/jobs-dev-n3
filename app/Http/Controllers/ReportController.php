@@ -2,10 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReportCreateRequest;
 use App\Http\Resources\ReportResource;
 use App\Models\Report;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Routing\ResponseFactory;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Class ReportController
@@ -15,65 +23,87 @@ class ReportController extends Controller
 {
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return AnonymousResourceCollection
      */
-    public function listReports(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $apiUrl = 'https://spaceflightnewsapi.net/api/v2';
+        $filter = $request->input('filter');
+
+        $result = Report::query()
+            ->when($request->has('filter'), function (Builder $query) use ($filter) {
+                return $query->where('title', 'LIKE', "%$filter%")
+                    ->orWhere('summary', 'LIKE', "%$filter%");
+            })
+            ->paginate(10);
+
+        return ReportResource::collection($result);
+    }
+
+    /**
+     * @param ReportCreateRequest $request
+     * @return JsonResponse
+     */
+    public function store(ReportCreateRequest $request): JsonResponse
+    {
+        return (new ReportResource(Report::create($request->validated())))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_CREATED);
+    }
+
+    /**
+     * @param Report $report
+     * @return Response|ResponseFactory
+     */
+    public function destroy(Report $report): Response|ResponseFactory
+    {
+        if (!empty($report)) {
+            $report->delete();
+            return response('', SymfonyResponse::HTTP_NO_CONTENT);
+        }
+
+        return response('', SymfonyResponse::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function storeManyReports(Request $request): JsonResponse
+    {
+        $filter = $request->input('filter');
+        $quantity = $request->input('quantity');
+
+        $apiUrl = 'https://api.spaceflightnewsapi.net/v4/reports/';
+
+        $request->has('quantity') ? $apiUrl .= "?limit=$quantity" : $apiUrl .= '?limit=100';
+
+        if ($request->has('filter')) {
+            $apiUrl .= "&search=$filter";
+        }
 
         $guzzle = new Client([
             'base_uri' => $apiUrl
         ]);
-        $rawResult = $guzzle->get('reports')->getBody();
 
-        $filter = $request->get('filter');
+        $reports = json_decode($guzzle->get('')->getBody(), true);
 
-        $result = [];
+        $results = [];
 
-        for ($x = 0; $x <= sizeof($rawResult); $x++) {
-            Report::create([
-                'external_id' => $rawResult[$x]['id'],
-                'title' => $rawResult[$x]['title'],
-                'url' => $rawResult[$x]['url'],
-                'summary' => $rawResult[$x]['summary']
-            ]);
+        foreach ($reports['results'] as $report) {
+            $reportQuery = Report::query()->where('external_id', $report['id']);
+            $report['external_id'] = $report['id'];
 
-            if (strpos($rawResult[$x], $filter) == false) {
-                continue;
+            if ($reportQuery->exists()) {
+                $reportModel = $reportQuery->update($report);
+            } else {
+                $reportModel = Report::create($report);
             }
 
-            $result[] = $rawResult[$x];
+            $results[] = $reportModel;
         }
 
-        return response()->json(['data' => $result]);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|object
-     */
-    public function createReport(Request $request)
-    {
-        $report = Report::create([
-            'external_id' => $request->post('external_id'),
-            'title' => $request->post('title'),
-            'url' => $request->post('url'),
-            'summary' => $request->post('summary')
-        ]);
-
-        return (new ReportResource($report))
-            ->response()
-            ->setStatusCode(201);
-    }
-
-    /**
-     * TODO: Implement it
-     *
-     * @param $reportId
-     */
-    public function deleteReport($reportId)
-    {
-        // Implementar esse endpoint.
+        return response()->json(
+            ReportResource::collection($results),
+            SymfonyResponse::HTTP_CREATED
+        );
     }
 }

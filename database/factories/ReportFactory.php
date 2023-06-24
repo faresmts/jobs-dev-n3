@@ -18,7 +18,7 @@ class ReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'external_id' => Str::random(),
+            'external_id' => random_int(1, 10000),
             'title' => fake()->realText(70),
             'url' => fake()->url,
             'summary' => fake()->realText(200),

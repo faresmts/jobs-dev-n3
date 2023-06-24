@@ -12,7 +12,7 @@ class ReportControllerTest extends TestCase
     /**
      * @test
      */
-    public function it_behaves_as_expected_when_listing_all_reports(): void
+    public function it_behaves_as_expected_when_listing_reports(): void
     {
         $reports = Report::factory(3)->create();
 
@@ -46,10 +46,35 @@ class ReportControllerTest extends TestCase
     /**
      * @test
      */
+    public function it_behaves_as_expected_when_listing_reports_with_filter(): void
+    {
+        $reports = Report::factory(2)->create();
+        $searchReport = Report::factory()->create([
+            'title' => 'NASA'
+        ]);
+
+        $response = $this->get(route('reports.index', ['filter' => 'NASA']));
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                [
+                    'external_id',
+                    'title',
+                    'url',
+                    'summary',
+                ],
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
     public function it_behaves_as_expected_when_creating_one_report(): void
     {
         $data = [
-            'external_id' => 'ABC123123',
+            'external_id' => 12312,
             'title' => 'This is a title',
             'url' => 'niceurl.com.br/nice',
             'summary' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -126,5 +151,16 @@ class ReportControllerTest extends TestCase
 
         $response->assertNotFound();
         $this->assertDatabaseCount('reports', 1);
+    }
+
+    /**
+     * @test
+     */
+    public function it_behaves_as_expected_when_creating_many_reports(): void
+    {
+        $response = $this->post(route('reports.store-many', ['quantity' => 10]));
+
+        $response->assertCreated();
+        $this->assertDatabaseCount('reports', 10);
     }
 }
