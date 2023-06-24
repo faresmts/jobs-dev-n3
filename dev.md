@@ -67,3 +67,4 @@ class Report extends Model
 ```
 5. Vi que não existe também um ReportFactory, então fiz também para acompanhar nos meus testes e prosseguir com TDD. Está em *database/factories/ReportFactory.php*
 6. Percebi alguns erros por conta de nomenclatura de libs após a atualização e fiz alguns fix no projeto para trabalhar.
+7. Agora vou começar a escrever os testes em *tests/Unit/ReportControllerTest.php*. Escrevi todos os casos do meu interesse e depois preenchendo as funções.

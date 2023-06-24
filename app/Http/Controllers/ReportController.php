@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ReportResource;
-use App\Report;
+use App\Models\Report;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
