@@ -1,0 +1,12 @@
+.env
+docker-compose.yml
+punit.cache
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+/.fleet
+/.idea
+/.vscode
