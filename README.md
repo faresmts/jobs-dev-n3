@@ -1,5 +1,12 @@
 # StarGrid – Teste Desevolvedor(a) Backend N3
 
+# Rodar o projeto localmente
+- Execute os dois comandos abaixo estando na pasta raiz do projeto e com Docker instalado
+```shell
+ chmod +x start.sh  
+ ./start.sh
+```
+
 ## Meu raciocínio inicial
 
 Assim que clonei o projeto e li o readme, analisei no seguinte fluxo: 
@@ -69,15 +76,5 @@ class Report extends Model
 8. E agora vou começar o TDD, ajustando o arquivo de rotas para um apiResource e ajustando as funções no controller.
 9. No meio dos testes, vi que a requisição não estava sendo feita corretamente, então logo fui ver a documentação da api e a v2 que fazem requisições não existe. Atualizei a url para a v4.
 10. Ainda na mesma função, vi que a responsabilidade de listar o report não estava totalmente isolada, criando reports sem validação, podendo até mesmo criar reports duplicados dentro do nosso banco de dados. Tomei a decisão de engenharia de deixar a função de listar reports para apenas listar os reports existentes no banco de dados, já que mesmo sendo um middlware de uma api, há no projeto base uma função de criar e persistir no banco. Além disso, vou fazer uma função para criar vários reports no banco de dados de acordo com um filtro na request.
-11. Terminei todas as funções com as implementações devidas. para subir o projeto localmente, pode executar o código abaixo tendo apenas o Docker instalado:
-
-```shell
- docker compose build --no-cache 
-     && docker compose up -d 
-     && docker compose exec laravel.test composer install 
-     && ./vendor/bin/sail npm install 
-     && ./vendor/bin/sail up -d 
-     && ./vendor/bin/sail npm run dev  
-```
 
 ![img.png](img.png)
