@@ -6,7 +6,7 @@
  chmod +x start.sh  
  ./start.sh
 ```
-
+Isso vai subir os containers e com acesso à api pelo *localhost:8080*
 ## Meu raciocínio inicial
 
 Assim que clonei o projeto e li o readme, analisei no seguinte fluxo: 
